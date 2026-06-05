@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WeatherFit — Outfit Suggester</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+</head>
+<body>
+
+  <!-- Animated background blobs -->
+  <div class="bg-scene">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+    <div class="noise"></div>
+  </div>
+
+  <div class="app-shell">
+
+    <!-- ── HEADER ─────────────────────────────────────────────────── -->
+    <header class="header">
+      <div class="logo">
+        <span class="logo-icon">🌤️</span>
+        <span class="logo-text">WeatherFit</span>
+      </div>
+      <p class="tagline">Outfit suggestions based on the current weather</p>
+    </header>
+
+    <!-- ── SEARCH ─────────────────────────────────────────────────── -->
+    <section class="search-section">
+      <div class="search-card">
+        <div class="search-row">
+          <div class="input-group">
+            <span class="input-icon">📍</span>
+            <input type="text" id="cityInput" placeholder="Enter city name…" autocomplete="off" />
+          </div>
+          <button id="searchBtn" class="btn-search">
+            <span class="btn-text">Get Forecast</span>
+            <span class="btn-icon">→</span>
+          </button>
+        </div>
+        <div class="api-row">
+          <span class="api-label">🔑 OpenWeather API Key</span>
+          <input type="text" id="apiKey" placeholder="Paste your API key for live weather (optional — demo available)" />
+          <a href="https://openweathermap.org/api" target="_blank" class="api-link">Get free key ↗</a>
+        </div>
+        <p class="demo-note">No API key? Try: Mumbai, Delhi, Bangalore, Chennai, Kolkata, Pune, Jaipur, Hyderabad</p>
+      </div>
+    </section>
+
+    <!-- ── ERROR ──────────────────────────────────────────────────── -->
+    <div id="errorBox" class="error-box hidden">
+      <span>⚠️</span><span id="errorMsg"></span>
+    </div>
+
+    <!-- ── LOADER ─────────────────────────────────────────────────── -->
+    <div id="loader" class="loader hidden">
+      <div class="spinner"></div>
+      <p>Fetching weather…</p>
+    </div>
+
+    <!-- ── RESULT ─────────────────────────────────────────────────── -->
+    <main id="resultSection" class="result-section hidden">
+
+      <!-- Weather card -->
+      <div class="weather-card" id="weatherCard">
+        <div class="weather-top">
+          <div class="location-block">
+            <h2 id="cityName" class="city-name">—</h2>
+            <p id="weatherDesc" class="weather-desc">—</p>
+            <span id="demoTag" class="demo-badge hidden">Demo Mode</span>
+          </div>
+          <div class="temp-block">
+            <img id="weatherIcon" src="" alt="weather icon" class="weather-icon" />
+            <span id="tempVal" class="temp-big">—°</span>
+          </div>
+        </div>
+
+        <div class="weather-stats">
+          <div class="stat">
+            <span class="stat-icon">🌡️</span>
+            <span class="stat-label">Feels like</span>
+            <span class="stat-val" id="feelsVal">—</span>
+          </div>
+          <div class="stat">
+            <span class="stat-icon">💧</span>
+            <span class="stat-label">Humidity</span>
+            <span class="stat-val" id="humidVal">—</span>
+          </div>
+          <div class="stat">
+            <span class="stat-icon">💨</span>
+            <span class="stat-label">Wind</span>
+            <span class="stat-val" id="windVal">—</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Outfit card -->
+      <div class="outfit-card" id="outfitCard">
+        <div class="outfit-header">
+          <h3 class="outfit-title">Outfit Recommendation</h3>
+          <span class="outfit-emoji" id="outfitEmoji">—</span>
+          <span class="outfit-vibe" id="outfitVibe">—</span>
+        </div>
+
+        <div class="outfit-grid">
+          <div class="outfit-item">
+            <div class="item-icon">👕</div>
+            <div class="item-info">
+              <span class="item-label">Top</span>
+              <span class="item-val" id="outfitTop">—</span>
+            </div>
+          </div>
+          <div class="outfit-item">
+            <div class="item-icon">👖</div>
+            <div class="item-info">
+              <span class="item-label">Bottom</span>
+              <span class="item-val" id="outfitBottom">—</span>
+            </div>
+          </div>
+          <div class="outfit-item">
+            <div class="item-icon">👟</div>
+            <div class="item-info">
+              <span class="item-label">Footwear</span>
+              <span class="item-val" id="outfitFootwear">—</span>
+            </div>
+          </div>
+          <div class="outfit-item">
+            <div class="item-icon">🎒</div>
+            <div class="item-info">
+              <span class="item-label">Accessories</span>
+              <span class="item-val" id="outfitAccessories">—</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Color palette -->
+        <div class="color-section">
+          <span class="color-label">🎨 Recommended Colors</span>
+          <div class="color-chips" id="colorChips"></div>
+        </div>
+
+        <!-- Tip -->
+        <div class="tip-box">
+          <span class="tip-icon">💡</span>
+          <p class="tip-text" id="outfitTip">—</p>
+        </div>
+      </div>
+
+    </main>
+
+    <footer class="footer">
+      <p>Built with Python · Flask · OpenWeatherMap · HTML/CSS</p>
+      <p>project</p>
+    </footer>
+
+  </div>
+
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
